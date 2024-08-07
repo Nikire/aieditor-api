@@ -20,3 +20,13 @@ $ yarn run start:dev
 # production mode
 $ yarn run start:prod
 ```
+
+## Prisma DB Migrations
+
+```bash
+# run migrations
+yarn run prisma migrate dev
+
+# create new migration
+yarn run prisma migrate dev --name <your_migration_name>
+```
