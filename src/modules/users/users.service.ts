@@ -8,15 +8,18 @@ import { DatabaseService } from '../database/database.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private database: DatabaseService) {}
+  constructor(private databaseService: DatabaseService) {}
   async create(createUserDto: CreateUserDto) {
     try {
-      const newUser = await this.database.createUser(createUserDto);
+      const newUser = await this.databaseService.user.create({
+        data: createUserDto,
+      });
+
       return {
         ...newUser,
         id: newUser.id.toString(),
-        createdAt: newUser.createdAt.toISOString(),
-        updatedAt: newUser.updatedAt.toISOString(),
+        createdAt: JSON.stringify(newUser.createdAt),
+        updatedAt: JSON.stringify(newUser.updatedAt),
       };
     } catch (error) {
       if (error.code === 'P2002') {
@@ -27,17 +30,17 @@ export class UsersService {
   }
 
   async findAll() {
-    const users = await this.database.user.findMany();
+    const users = await this.databaseService.user.findMany();
     return users.map((user) => ({
       ...user,
       id: user.id.toString(),
-      createdAt: user.createdAt.toISOString(),
-      updatedAt: user.updatedAt.toISOString(),
+      createdAt: JSON.stringify(user.createdAt),
+      updatedAt: JSON.stringify(user.updatedAt),
     }));
   }
 
   async findOne(uid: string) {
-    const user = await this.database.user.findUnique({
+    const user = await this.databaseService.user.findUnique({
       where: { uid },
     });
     if (!user) {
@@ -46,8 +49,8 @@ export class UsersService {
     return {
       ...user,
       id: user.id.toString(),
-      createdAt: user.createdAt.toISOString(),
-      updatedAt: user.updatedAt.toISOString(),
+      createdAt: JSON.stringify(user.createdAt),
+      updatedAt: JSON.stringify(user.updatedAt),
     };
   }
 
@@ -55,7 +58,7 @@ export class UsersService {
     if (!uid) {
       throw new NotFoundException(`User #${uid} not found`);
     }
-    const existingUser = await this.database.user.findUnique({
+    const existingUser = await this.databaseService.user.findUnique({
       where: { uid },
     });
 
@@ -63,15 +66,15 @@ export class UsersService {
       throw new NotFoundException(`User #${uid} not found`);
     }
 
-    const updatedUser = await this.database.user.update({
+    const updatedUser = await this.databaseService.user.update({
       where: { uid },
       data: updateUserDto,
     });
     return {
       ...updatedUser,
       id: updatedUser.id.toString(),
-      createdAt: updatedUser.createdAt.toISOString(),
-      updatedAt: updatedUser.updatedAt.toISOString(),
+      createdAt: JSON.stringify(updatedUser.createdAt),
+      updatedAt: JSON.stringify(updatedUser.updatedAt),
     };
   }
 
@@ -79,13 +82,13 @@ export class UsersService {
     if (!uid) {
       throw new NotFoundException(`User #${uid} not found`);
     }
-    const existingUser = await this.database.user.findUnique({
+    const existingUser = await this.databaseService.user.findUnique({
       where: { uid },
     });
     if (!existingUser) {
       throw new NotFoundException(`User #${uid} not found`);
     }
-    await this.database.user.delete({ where: { uid } });
+    await this.databaseService.user.delete({ where: { uid } });
     return { message: `User deleted successfully` };
   }
 }
