@@ -1,25 +1,64 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto, UpdateAuthDto } from './dto/auth.dto';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+import { LoginDto, RegisterDto } from './dto/auth.dto';
+import * as bycrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
+  async register({ name, email, password }: RegisterDto) {
+    const user = await this.usersService.findByEmail(email);
+
+    if (user) {
+      throw new BadRequestException('User already exists');
+    }
+
+    const newUser = await this.usersService.create({
+      name,
+      email,
+      password: await bycrypt.hash(password, 10),
+    });
+
+    return {
+      ...newUser,
+    };
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async login({ email, password }: LoginDto) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('Email is wrong');
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+    const isPasswordValid = await bycrypt.compare(password, user.password);
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Password is wrong');
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    const payload = {
+      email: user.email,
+    };
+
+    const token = await this.jwtService.signAsync(payload);
+
+    return {
+      token,
+      email,
+    };
+
+    /*     return {
+      name: user.name,
+      email: user.email,
+      // TODO: check why not is possible enter user, example: return {...user}
+    }; */
   }
 }
