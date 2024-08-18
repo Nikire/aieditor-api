@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { ProjectsController } from './projects.controller';
-import { DatabaseModule } from '../database/database.module';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [SharedModule],
   controllers: [ProjectsController],
   providers: [ProjectsService],
 })
