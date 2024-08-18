@@ -9,7 +9,6 @@ export class ProjectsService {
     const owner = await this.databaseService.user.findFirst({
       where: { uid: createProjectDto.userUuid },
     });
-    console.log(owner);
     const newProject = await this.databaseService.project.create({
       data: {
         name: createProjectDto.name,
