@@ -9,8 +9,10 @@ import {
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto, UpdateProjectDto } from './dto/projects.dto';
+import { Auth } from '../shared/modules/auth/auth.decorator';
 
 @Controller('projects')
+@Auth()
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
