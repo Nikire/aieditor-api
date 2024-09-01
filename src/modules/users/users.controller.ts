@@ -9,8 +9,10 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { Auth } from '../shared/modules/auth/auth.decorator';
 
 @Controller('users')
+@Auth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
