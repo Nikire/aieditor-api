@@ -1,6 +1,7 @@
 import {
   IsNotEmpty,
   IsObject,
+  IsOptional,
   IsString,
   IsUUID,
   Length,
@@ -24,11 +25,13 @@ export class CreateProjectDto {
   settings: ProjectSettingsType;
 }
 export class UpdateProjectDto {
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @Length(1, 50)
   name?: string;
 
+  @IsOptional()
   @IsString()
   description?: string;
 
@@ -36,6 +39,7 @@ export class UpdateProjectDto {
   @IsUUID()
   userUuid: string;
 
+  @IsOptional()
   @IsObject()
   settings?: ProjectSettingsType;
 }

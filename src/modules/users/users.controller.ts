@@ -9,14 +9,15 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { Auth } from '../shared/modules/auth/auth.decorator';
+import { Auth } from '../shared/modules/auth/decorators/auth.decorator';
 
 @Controller('users')
-@Auth()
+@Auth(['USER'])
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @Auth(['ADMIN'])
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
@@ -37,6 +38,7 @@ export class UsersController {
   }
 
   @Delete(':uid')
+  @Auth(['SUPER_ADMIN'])
   remove(@Param('uid') uid: string) {
     return this.usersService.remove(uid);
   }
