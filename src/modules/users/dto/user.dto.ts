@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsStrongPassword,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -9,8 +15,14 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
-  @IsString()
-  @Length(3, 15)
+  @IsNotEmpty()
+  @MaxLength(20)
+  @IsStrongPassword({
+    minLength: 3,
+    minLowercase: 1,
+    minNumbers: 1,
+    minUppercase: 1,
+  })
   password: string;
 }
 export class UpdateUserDto {
@@ -22,7 +34,13 @@ export class UpdateUserDto {
   @IsEmail()
   email?: string;
 
-  @IsString()
-  @Length(3, 15)
+  @IsNotEmpty()
+  @MaxLength(20)
+  @IsStrongPassword({
+    minLength: 3,
+    minLowercase: 1,
+    minNumbers: 1,
+    minUppercase: 1,
+  })
   password?: string;
 }

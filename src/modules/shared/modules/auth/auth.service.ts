@@ -3,10 +3,11 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { LoginDto, RegisterDto } from './dto/auth.dto';
+import { LoginDto } from './dto/auth.dto';
 import * as bycrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from 'src/modules/users/users.service';
+import { CreateUserDto } from 'src/modules/users/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,9 +15,9 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
-  async register({ name, email, password }: RegisterDto) {
-    const user = await this.usersService.findByEmail(email);
 
+  async register({ name, email, password }: CreateUserDto) {
+    const user = await this.usersService.findByEmail(email);
     if (user) {
       throw new BadRequestException('User already exists');
     }
@@ -27,8 +28,10 @@ export class AuthService {
       password: await bycrypt.hash(password, 10),
     });
 
+    const { token } = await this.login({ email, password });
     return {
       ...newUser,
+      token,
     };
   }
 
@@ -44,21 +47,13 @@ export class AuthService {
       throw new UnauthorizedException('Password is wrong');
     }
 
-    const payload = {
-      email: user.email,
-    };
+    const payload = user;
 
-    const token = await this.jwtService.signAsync(payload);
+    const token = await this.jwtService.signAsync(payload, { expiresIn: '1d' });
 
     return {
+      ...user,
       token,
-      email,
     };
-
-    /*     return {
-      name: user.name,
-      email: user.email,
-      // TODO: check why not is possible enter user, example: return {...user}
-    }; */
   }
 }
