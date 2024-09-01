@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
   MaxLength,
@@ -26,14 +27,17 @@ export class CreateUserDto {
   password: string;
 }
 export class UpdateUserDto {
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   name?: string;
 
+  @IsOptional()
   @IsString()
   @IsEmail()
   email?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @MaxLength(20)
   @IsStrongPassword({
