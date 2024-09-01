@@ -91,4 +91,10 @@ export class UsersService {
     await this.databaseService.user.delete({ where: { uid } });
     return { message: `User deleted successfully` };
   }
+
+  async findByEmail(email: string) {
+    return await this.databaseService.user.findUnique({
+      where: { email },
+    });
+  }
 }
